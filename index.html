@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <style>
+        /* Stylish background */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #3b8d99, #6a9dc4);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        /* Payment container */
+        .payment-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Input field styling */
+        .input-field {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .input-field label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .input-field input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        /* 3D button style */
+        .payment-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <h2>Payment Page</h2>
+        <form id="paymentForm">
+            <!-- Product Name -->
+            <div class="input-field">
+                <label for="productName">Product Name</label>
+                <input type="text" id="productName" placeholder="Enter product name" required>
+            </div>
+            <!-- Product Price -->
+            <div class="input-field">
+                <label for="productPrice">Product Price (USD)</label>
+                <input type="number" id="productPrice" placeholder="Enter product price" required>
+            </div>
+            <!-- Card Number -->
+            <div class="input-field">
+                <label for="cardNumber">Card Number</label>
+                <input type="text" id="cardNumber" placeholder="Enter card number" maxlength="16" required>
+            </div>
+            <!-- Expiry Date -->
+            <div class="input-field">
+                <label for="expDate">Exp. Date (MM/YY)</label>
+                <input type="text" id="expDate" placeholder="MM/YY" maxlength="5" required>
+            </div>
+            <!-- CVV -->
+            <div class="input-field">
+                <label for="cvv">CVV</label>
+                <input type="text" id="cvv" placeholder="CVV" maxlength="3" required>
+            </div>
+            <!-- Submit Button -->
+            <button type="button" class="payment-btn" onclick="processPayment()">Pay Now</button>
+            <div id="error" class="error"></div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        function processPayment() {
+            const productName = document.getElementById('productName').value;
+            const productPrice = document.getElementById('productPrice').value;
+            const cardNumber = document.getElementById('cardNumber').value;
+            const expDate = document.getElementById('expDate').value;
+            const cvv = document.getElementById('cvv').value;
+            const errorElement = document.getElementById('error');
+
+            // Validate inputs
+            if (!productName || !productPrice || !cardNumber || !expDate || !cvv) {
+                errorElement.textContent = "All fields are required.";
+                return;
+            }
+
+            if (cardNumber.length !== 16) {
+                errorElement.textContent = "Card number must be 16 digits.";
+                return;
+            }
+
+            if (expDate.length !== 5 || !expDate.includes('/')) {
+                errorElement.textContent = "Invalid expiry date format.";
+                return;
+            }
+
+            if (cvv.length !== 3) {
+                errorElement.textContent = "CVV must be 3 digits.";
+                return;
+            }
+
+            // If all fields are valid, proceed with payment process
+            errorElement.textContent = "";
+
+            // API call to send payment info (Binance or other API)
+            axios.post('https://api.binance.com/api/v3/order', {
+                symbol: 'BTCUSDT',
+                side: 'BUY',
+                type: 'LIMIT',
+                price: productPrice,
+                quantity: 0.001,  // Example quantity
+                apiKey: 'DSW0zVqt5HL46PHddqxmOndBpWVrQPvDPJ4uCa4armbj1fSjAFAmssCRsTPjkDX9',
+                secretKey: 'keJ5T8bWp62o22ntNpR2ND386hQqhT1GVLDw0EZLqe9ZasdbIJppx8MS4Usst85T',
+                usdtAddress: 'TCzSfcTu5Ch8ZxNeNXoL1ZanKPkCARz441'
+            })
+            .then(response => {
+                alert(`Payment Successful! ${productName} purchased for $${productPrice} USD.`);
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.error('Payment Error:', error);
+                alert('An error occurred while processing your payment.');
+            });
+        }
+    </script>
+</body>
+</html>
